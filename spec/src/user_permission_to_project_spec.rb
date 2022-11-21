@@ -17,43 +17,31 @@ RSpec.describe UserPermissionToProject do
       end
     end
 
-    context "when the project has a specific user list" do
+    context "when the user is on the project user list" do
       before do
-        create(:project_user, project: project, user: create(:user, team: project.team))
+        create(:project_user, project: project, user: user)
+       end
+
+      it "returns true" do
+        expect(subject.run).to eq(true)
+      end
+    end
+
+    context "when the user is NOT on the project user list" do
+      context "and the user is not a super user" do
+        it "returns false" do
+          expect(subject.run).to eq(false)
+        end
       end
 
-      context "and the user is on that list" do
+      context "and the user is a super user" do
         before do
-          create(:project_user, project: project, user: user)
+          user.update(super_user: true)
         end
 
         it "returns true" do
           expect(subject.run).to eq(true)
         end
-      end
-
-      context "and the user is NOT on that list" do
-        context "and the user is not a super user" do
-          it "returns false" do
-            expect(subject.run).to eq(false)
-          end
-        end
-
-        context "and the user is a super user" do
-          before do
-            user.update(super_user: true)
-          end
-
-          it "returns true" do
-            expect(subject.run).to eq(true)
-          end
-        end
-      end
-    end
-
-    context "when the project DOES NOT have a specific user list" do
-      it "returns true" do
-        expect(subject.run).to eq(false)
       end
     end
   end
