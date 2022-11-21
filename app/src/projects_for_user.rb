@@ -10,10 +10,9 @@ class ProjectsForUser
 
   def run
     return [] if @user.deleted
-    projects.map do |project|
-      next unless user_on_project?(project)
-      project
-    end.compact.sort_by(&:title)
+    projects.filter_map do |project|
+      project if user_on_project?(project)
+    end.sort_by(&:title)
   end
 
   private
@@ -24,7 +23,6 @@ class ProjectsForUser
 
   def user_on_project?(project)
     users = project.project_users
-    return true if users.empty?
     return true if @user.super_user
     users.map(&:user_id).include? @user.id
   end

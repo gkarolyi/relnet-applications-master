@@ -76,7 +76,7 @@ describe 'releases' do
 
   context "when requesting a project not owned by team" do
     let(:project1) { create(:project, :with_team) }
-    it 'lists the releases for the particular project' do
+    it 'returns an access forbidden error' do
       get api_project_releases_path(project_public_key: project1.public_key), params: {},
           headers: team_auth_headers(project.team)
       expect(parsed_response).to eq({'error' => 'forbidden'})

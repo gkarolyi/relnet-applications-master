@@ -18,11 +18,17 @@ class ProjectsController < ProjectsBaseController
   end
 
   def create
-    project = Project.create!(
-      title: params[:name],
-      team: current_user.team,
-      public_feed: params[:visibility] == 'Public'
-    )
+    Project.transaction do
+      project = Project.create!(
+        title: params[:name],
+        team: current_user.team,
+        public_feed: params[:visibility] == 'Public'
+      )
+      ProjectUser.create!(
+        project: project,
+        user_id: current_user.id
+      )
+    end
 
     flash[:success] = 'Project created'
     return redirect_to dashboard_path
